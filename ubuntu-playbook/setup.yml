@@ -1,0 +1,86 @@
+---
+- hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: yes
+
+    - name: Install apt-transport-https and ca-certificates
+      apt:
+        name: ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common']
+        state: present
+
+    - name: Update existing list of packages
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: "https://download.docker.com/linux/ubuntu/gpg"
+        id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker and related packages
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes  # Boot時に自動起動
+
+    - name: Install net-tools and iproute2
+      apt:
+        name:
+          - net-tools
+          - iproute2
+        state: present
+
+    - name: Install build-essential
+      apt:
+        name: build-essential
+        state: present
+
+    - name: Install Chromium Browser
+      apt:
+        name: chromium-browser
+        state: present
+
+    - name: Add Microsoft GPG key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+
+    - name: Add VS Code APT repository
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+        state: present
+
+    - name: Install Visual Studio Code
+      apt:
+        name: code
+        state: present
+
