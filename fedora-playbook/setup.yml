@@ -1,0 +1,70 @@
+---
+- hosts: localhost
+  connection: local
+
+  tasks:
+
+    - name: Install required packages for Docker
+      dnf:
+        name:
+          - curl
+          - dnf-plugins-core
+        state: present
+
+    - name: Ensure dnf-plugins-core is installed
+      dnf:
+        name: dnf-plugins-core
+        state: present
+
+    - name: Add Docker repo
+      command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+      # The 'creates' argument ensures the command doesn't run if the repo file already exists.
+
+    - name: Install Docker components
+      dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes  # Boot時に自動起動
+
+    - name: Install net-tools and iproute
+      dnf:
+        name:
+          - net-tools
+          - iproute
+        state: present
+
+    - name: Install development tools
+      dnf:
+        name: "@development-tools"
+        state: present
+
+    - name: Install Chromium Browser
+      dnf:
+        name: chromium
+        state: present
+
+    - name: Add Microsoft GPG key for VS Code
+      rpm_key:
+        state: present
+        key: https://packages.microsoft.com/keys/microsoft.asc
+
+    - name: Add VS Code repo
+      command:
+        cmd: "dnf config-manager --add-repo https://packages.microsoft.com/yumrepos/vscode"
+        warn: false
+
+    - name: Install Visual Studio Code
+      dnf:
+        name: code
+        state: present

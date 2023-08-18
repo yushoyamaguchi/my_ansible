@@ -10,3 +10,8 @@ sudo apt install ansible
 
 ## fedora
 sudo dnf install ansible
+
+# exec
+```
+sudo ansible-playbook setup.yml 
+```
